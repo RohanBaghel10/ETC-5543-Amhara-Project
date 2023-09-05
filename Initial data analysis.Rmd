@@ -18,34 +18,30 @@ library(forecast)
 ```{r}
 data <- read_csv(here::here("data/famillyplanning_maternal_child_health_products.csv"))
 
-data$Date <- as.Date(paste(data$month, "01", sep = "-"), format = "%Y-%b-%d")
+data$Date <- as.Date(paste0(data$month, "01"), format = "%Y %b %d")
 
-ts_data <- ts(data, start = c(2017, 10), frequency = 12)
-
-data$TimeSeriesColumn <- ts_data
+tsibble_data <- data %>%
+  as_tsibble(index = Date, key = c(region, item)) %>%
+  mutate(Date = yearmonth(Date)) %>%
+  select(region, item, Date, total_issued)
 
 ```
 
 
 ```{r}
-data_Amoxicillin_125 <- data %>% 
-  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)" )
+data_Amoxicillin_125 <- tsibble_data %>% 
+  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"
+         )
 
 ggplot(data = data_Amoxicillin_125, 
-       aes(x = month,
+       aes(x = Date,
            y = total_issued)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(y = "Amoxicillin 125mg issued")
 
-ts_data_125 <- ts(data_Amoxicillin_125$total_issued, start = c(2017, 10), frequency = 12)
-
-
-autoplot(ts_data_125) +
-  labs(x = "Month", y = "Total Issued") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
+data_Amoxicillin_125 %>% 
+  autoplot()
 ```
 
 
