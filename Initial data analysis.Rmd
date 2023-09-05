@@ -33,13 +33,6 @@ data_Amoxicillin_125 <- tsibble_data %>%
   filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"
          )
 
-ggplot(data = data_Amoxicillin_125, 
-       aes(x = Date,
-           y = total_issued)) +
-  geom_point() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Amoxicillin 125mg issued")
-
 data_Amoxicillin_125 %>% 
   autoplot()
 ```
