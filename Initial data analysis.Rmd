@@ -28,14 +28,155 @@ tsibble_data <- data %>%
 ```
 
 
-```{r}
+```{r Amoxicillin_125}
 data_Amoxicillin_125 <- tsibble_data %>% 
   filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"
          )
 
 data_Amoxicillin_125 %>% 
+  autoplot() +
+  facet_wrap(~ region) +
+  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  theme(legend.position = "none")
+```
+
+```{r}
+data_Amoxicillin_250 <- tsibble_data %>% 
+  filter(item == "Amoxicillin - 250mg - Tablet (Dispersible)"
+         )
+
+data_Amoxicillin_250 %>% 
+  autoplot() +
+  facet_wrap(~ region) +
+  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  theme(legend.position = "none")
+```
+
+```{r Chlorhexidine}
+data_Chlorhexidine <- tsibble_data %>% 
+  filter(item == "Chlorhexidine digluconate - 7.1% ( which contains 4% Chlorhexidine) - Gel"   
+         )
+
+data_Chlorhexidine %>% 
   autoplot()
 ```
 
 
+```{r}
+data_Etonogestral <- tsibble_data %>% 
+  filter(item == "Etonogestrel - 68mg - Capsule(Subdermal Implant)"   
+         )
+
+data_Etonogestral %>% 
+  autoplot()
+```
+
+
+```{r}
+data_Gentamicin_10mg <- tsibble_data %>% 
+  filter(item == "Gentamicin - 10mg/ml 2ml - Injection"   
+         )
+
+data_Gentamicin_10mg %>% 
+  autoplot()
+```
+
+```{r}
+data_Gentamicin_40mg <- tsibble_data %>% 
+  filter(item == "Gentamicin - 40mg/2ml in 2ml Ampoule - Injection"  
+         )
+
+data_Gentamicin_40mg %>% 
+  autoplot()
+```
+
+```{r}
+data_IUCD <- tsibble_data %>% 
+  filter(item == "IUCD (Intrauterine Contraceptive Device) -  - Long acting (CU380 A)" 
+         )
+
+data_IUCD %>% 
+  autoplot()
+```
+
+
+```{r}
+data_Levonorgestrel_0.03mg <- tsibble_data %>% 
+  filter(item == "Levonorgestrel (D-Norgestrel) - 0.03mg - Tablet"  
+         )
+
+data_Levonorgestrel_0.03mg%>% 
+  autoplot()
+```
+
+
+```{r}
+data_Levonorgestrel_0.75mg <- tsibble_data %>% 
+  filter(item == "Levonorgestrel (D-Norgestrel) - 0.75mg - Tablet"   
+         )
+
+data_Levonorgestrel_0.75mg%>% 
+  autoplot()
+```
+
+
+```{r}
+data_Levonorgestrel_75mg <- tsibble_data %>% 
+  filter(item == "Levonorgestrel - 75mg/capsule pack of 2 capsule"   
+         )
+
+data_Levonorgestrel_75mg%>% 
+  autoplot()
+```
+
+```{r}
+data_Levonorgestrel_mix <- tsibble_data %>% 
+  filter(item == "Levonorgestrel(D-Norgestrel) +Ethinylestradiol + Ferrous Fumerate - (0.15mg + 0.03mg +75mg ) - Tablet"  
+         )
+
+data_Levonorgestrel_mix%>% 
+  autoplot()
+```
+
+
+
+```{r}
+data_MgSO4 <- tsibble_data %>% 
+  filter(item == "Magnesium Sulphate - 50% in 10ml Ampoule - Injection" 
+         )
+
+data_MgSO4%>% 
+  autoplot()
+```
+
+```{r}
+data_Medroxyprogesterone <- tsibble_data %>% 
+  filter(item == "Medroxyprogesterone Acetate 150mg/ml in 1ml vial (2ml)" 
+         )
+
+data_Medroxyprogesterone%>% 
+  autoplot()
+```
+
+```{r}
+data_ORS <- tsibble_data %>% 
+  filter(item == "Oral Rehydration Salt - 20.5g/lit - Powder"
+         )
+
+data_ORS%>% 
+  autoplot()
+```
+
+
+```{r}
+data_Oxytocin <- tsibble_data %>% 
+  filter(item == "Oxytocin - 10 Units/ml in 1ml Ampoule - Injection" 
+         )
+
+data_Oxytocin%>% 
+  autoplot() +
+  facet_wrap(~ region) +
+  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  theme(legend.position = "none")
+```
 
