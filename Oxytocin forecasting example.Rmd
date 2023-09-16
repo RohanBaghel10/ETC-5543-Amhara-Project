@@ -1,0 +1,103 @@
+---
+title: "Data Analysis Oxytocin"
+author: "Rohan Baghel (32725787)"
+date: "2023-09-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data <- read_csv(here::here("data/famillyplanning_maternal_child_health_products.csv"))
+
+data$Date <- as.Date(paste0(data$month, "01"), format = "%Y %b %d")
+
+tsibble_data <- data %>%
+  as_tsibble(index = Date, key = c(region, item)) %>%
+  mutate(Date = yearmonth(Date)) %>%
+  select(region, item, Date, total_issued)
+```
+
+```{r}
+data_Oxytocin <- tsibble_data %>% 
+  filter(item == "Oxytocin - 10 Units/ml in 1ml Ampoule - Injection" 
+         )
+
+data_Oxytocin%>% 
+  autoplot() +
+  facet_wrap(~ region, scales = "free") +
+  theme(legend.position = "none")
+
+```
+
+```{r}
+data_adis <- data_Oxytocin %>% 
+  filter(region == "Addis Ababa")
+
+
+data_adis %>% 
+  autoplot()
+
+data_adis %>% 
+  gg_subseries(total_issued) 
+
+```
+
+
+
+
+```{r}
+
+
+stl_adis <- data_adis %>%
+  model(stl = STL((total_issued) ~ trend() + season()))
+
+
+
+stl_adis %>% 
+  components() %>% 
+  autoplot()
+
+```
+
+
+```{r}
+data_adis %>%
+  gg_tsdisplay((total_issued), plot_type = "partial") 
+```
+
+
+
+
+
+```{r}
+# Fit an ARIMA model
+ARIMA_adis <- data_adis %>% 
+  model(auto = ARIMA(total_issued, trace = TRUE))
+
+glance(ARIMA_adis)
+
+ARIMA_adis %>% 
+  forecast(h = "2 years") %>% 
+  filter(.model == "auto" ) %>% 
+  autoplot(data_adis)
+
+```
+
+```{r}
+# Fit an ETS model
+
+ETS_adis <- data_adis %>% 
+  model(auto = ETS(total_issued))
+
+glance(ETS_adis)
+
+ETS_adis %>% 
+  forecast(h = "2 years") %>% 
+  filter(.model == "auto" ) %>% 
+  autoplot(data_adis)
+  
+```
+
