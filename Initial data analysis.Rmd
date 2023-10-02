@@ -35,8 +35,7 @@ data_Amoxicillin_125 <- tsibble_data %>%
 
 data_Amoxicillin_125 %>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -47,8 +46,7 @@ data_Amoxicillin_250 <- tsibble_data %>%
 
 data_Amoxicillin_250 %>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -59,8 +57,7 @@ data_Chlorhexidine <- tsibble_data %>%
 
 data_Chlorhexidine %>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -72,8 +69,7 @@ data_Etonogestral <- tsibble_data %>%
 
 data_Etonogestral %>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -85,8 +81,7 @@ data_Gentamicin_10mg <- tsibble_data %>%
 
 data_Gentamicin_10mg %>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -97,8 +92,7 @@ data_Gentamicin_40mg <- tsibble_data %>%
 
 data_Gentamicin_40mg %>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -109,8 +103,7 @@ data_IUCD <- tsibble_data %>%
 
 data_IUCD %>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -122,8 +115,7 @@ data_Levonorgestrel_0.03mg <- tsibble_data %>%
 
 data_Levonorgestrel_0.03mg%>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -135,8 +127,7 @@ data_Levonorgestrel_0.75mg <- tsibble_data %>%
 
 data_Levonorgestrel_0.75mg%>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -148,8 +139,7 @@ data_Levonorgestrel_75mg <- tsibble_data %>%
 
 data_Levonorgestrel_75mg%>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -160,8 +150,7 @@ data_Levonorgestrel_mix <- tsibble_data %>%
 
 data_Levonorgestrel_mix%>% 
   autoplot +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -174,8 +163,7 @@ data_MgSO4 <- tsibble_data %>%
 
 data_MgSO4%>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -186,8 +174,7 @@ data_Medroxyprogesterone <- tsibble_data %>%
 
 data_Medroxyprogesterone%>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -198,8 +185,7 @@ data_ORS <- tsibble_data %>%
 
 data_ORS%>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
 ```
 
@@ -211,8 +197,8 @@ data_Oxytocin <- tsibble_data %>%
 
 data_Oxytocin%>% 
   autoplot() +
-  facet_wrap(~ region) +
-  scale_y_continuous(labels = scales::number_format(scale = 1e-3)) +
+  facet_wrap(~ region, scales = "free") +
   theme(legend.position = "none")
+
 ```
 
