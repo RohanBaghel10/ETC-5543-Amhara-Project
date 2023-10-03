@@ -18,6 +18,7 @@ tsibble_data <- data %>%
   as_tsibble(index = Date, key = c(region, item)) %>%
   mutate(Date = yearmonth(Date)) %>%
   select(region, item, Date, total_issued)
+
 ```
 
 ```{r}
@@ -74,30 +75,33 @@ data_adis %>%
 
 ```{r}
 # Fit an ARIMA model
-ARIMA_adis <- data_adis %>% 
-  model(auto = ARIMA(total_issued, trace = TRUE))
+models_adis <- data_adis %>% 
+  model(ARIMA = ARIMA(total_issued),
+        ETS = ETS(total_issued),
+        naive = NAIVE(total_issued))
 
-glance(ARIMA_adis)
+glance(models_adis)
 
-ARIMA_adis %>% 
-  forecast(h = "2 years") %>% 
-  filter(.model == "auto" ) %>% 
-  autoplot(data_adis)
+Adis_forecast <- models_adis %>% 
+  forecast(h = "1 years")
+
+forecast_pos <- Adis_forecast %>%
+  mutate(.mean = ifelse(.mean < 0, 0, .mean))
+
+
+cross_val_results <- data_Oxytocin %>%
+  filter(region == "Addis Ababa") %>%
+  model(ARIMA = ARIMA(total_issued),
+        ETS = ETS(total_issued),
+        naive = NAIVE(total_issued)) %>%
+  tidy(crossval = TRUE)
+
+cross_val_results
+
 
 ```
 
-```{r}
-# Fit an ETS model
 
-ETS_adis <- data_adis %>% 
-  model(auto = ETS(total_issued))
 
-glance(ETS_adis)
 
-ETS_adis %>% 
-  forecast(h = "2 years") %>% 
-  filter(.model == "auto" ) %>% 
-  autoplot(data_adis)
-  
-```
 
