@@ -17,7 +17,7 @@ data$Date <- as.Date(paste0(data$month, "01"), format = "%Y %b %d")
 tsibble_data <- data %>%
   as_tsibble(index = Date, key = c(region, item)) %>%
   mutate(Date = yearmonth(Date)) %>%
-  select(region, item, Date, total_issued)
+  select(Date, region, item, total_issued)
 
 ```
 
@@ -33,18 +33,6 @@ data_Oxytocin%>%
 
 ```
 
-```{r}
-data_adis <- data_Oxytocin %>% 
-  filter(region == "Addis Ababa")
-
-
-data_adis %>% 
-  autoplot()
-
-data_adis %>% 
-  gg_subseries(total_issued) 
-
-```
 
 
 
@@ -73,35 +61,204 @@ data_adis %>%
 
 
 
-```{r}
-# Fit an ARIMA model
-models_adis <- data_adis %>% 
-  model(ARIMA = ARIMA(total_issued),
-        ETS = ETS(total_issued),
-        naive = NAIVE(total_issued))
+```{r message=FALSE,echo=FALSE,warning=FALSE}
+unique_regions <- unique(data_Oxytocin$region)
 
-glance(models_adis)
-
-Adis_forecast <- models_adis %>% 
-  forecast(h = "1 years")
-
-forecast_pos <- Adis_forecast %>%
-  mutate(.mean = ifelse(.mean < 0, 0, .mean))
-
-
-cross_val_results <- data_Oxytocin %>%
-  filter(region == "Addis Ababa") %>%
-  model(ARIMA = ARIMA(total_issued),
-        ETS = ETS(total_issued),
-        naive = NAIVE(total_issued)) %>%
-  tidy(crossval = TRUE)
-
-cross_val_results
+for (region in unique_regions) {
+  cat("Processing region:", region, "\n")
+  
+  # Filter data for the current region
+  data_region <- data_Oxytocin %>% filter(region == region)
+  
+  # Model creation
+  models_region <- data_region %>% 
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    )
+  
+  # Forecasting
+  forecast_region <- models_region %>% 
+    forecast(h = "1 years")
+  
+  # Plotting forecast
+  forecast_region %>% 
+    autoplot(data_region)
+  
+  # Ensure non-negative forecasts
+  forecast_pos_region <- forecast_region %>%
+    mutate(.mean = ifelse(.mean < 0, 0, .mean))
+  
+  # Cross-validation results
+  cross_val_results_region <- data_Oxytocin %>%
+    filter(region == region) %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    tidy(crossval = TRUE)
+}
 
 
 ```
 
 
 
+```{r winkler and accuracy error}
+
+data_adis <- as_tsibble(data_adis)
+
+data_adis_2022 <- data_adis %>% 
+  filter(year(Date) < 2023) %>% 
+  model(ARIMA = ARIMA(total_issued),
+        ETS = ETS(total_issued),
+        naive = NAIVE(total_issued)) %>%
+  forecast(h = 5) %>%
+  accuracy(data_adis)
 
 
+  
+
+
+
+
+
+
+
+
+
+  
+data_Adis_new <- data_adis_2022 %>% 
+  filter(year(Date) < '2022') %>% 
+  model(ARIMA = ARIMA(total_issued),
+        ETS = ETS(total_issued),
+        naive = NAIVE(total_issued))
+  
+  
+
+data_Adis_new %>% 
+  forecast(h = "1 year") %>% 
+  accuracy(data_adis_2022)
+  
+  
+  
+winkler_scores <- models_adis %>%
+  forecast(h = '1 year') %>% 
+  accuracy(data = data_adis_2022, measure = winkler_loss)
+
+
+```
+
+### Forecasting in Addis Ababa
+
+```{r}
+forecast_region %>% 
+  filter(region == "Addis Ababa") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Addis Ababa"))
+```
+
+
+### Forecasting in Affar
+```{r}
+forecast_region %>% 
+  filter(region == "Affar") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Affar"))
+```
+
+### Forecasting in Amhara
+```{r}
+forecast_region %>% 
+  filter(region == "Amhara") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Amhara"))
+```
+
+### Forecasting in Benishangul-Gumuz
+```{r}
+
+glance(models_region %>% 
+         filter(region == "Benishangul-Gumuz"))
+
+forecast_region %>% 
+  filter(region == "Benishangul-Gumuz") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Benishangul-Gumuz"))
+```
+
+### Forecasting in Dire Dawa
+```{r}
+forecast_region %>% 
+  filter(region == "Dire Dawa") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Dire Dawa"))
+```
+
+
+### Forecasting in Gambella 
+```{r}
+forecast_region %>% 
+  filter(region == "Gambella") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Gambella"))
+```
+
+### Forecasting in Harari 
+```{r}
+forecast_region %>% 
+  filter(region == "Harari") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Harari"))
+```
+
+
+### Forecasting in Oromia
+```{r}
+forecast_region %>% 
+  filter(region == "Oromia") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Oromia"))
+```
+
+### Forecasting in Sidama
+```{r}
+forecast_region %>% 
+  filter(region == "Sidama") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Sidama"))
+```
+
+### Forecasting in SNNP
+```{r}
+forecast_region %>% 
+  filter(region == "SNNP") %>% 
+  autoplot(data_region %>% 
+             filter(region == "SNNP"))
+```
+
+### Forecasting in Somali
+```{r}
+forecast_region %>% 
+  filter(region == "Somali") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Somali"))
+```
+
+### Forecasting in South West
+```{r}
+forecast_region %>% 
+  filter(region == "South West") %>% 
+  autoplot(data_region %>% 
+             filter(region == "South West"))
+```
+
+### Forecasting in Tigray
+```{r}
+forecast_region %>% 
+  filter(region == "Tigray") %>% 
+  autoplot(data_region %>% 
+             filter(region == "Tigray"))
+```
