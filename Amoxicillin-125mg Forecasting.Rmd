@@ -1,0 +1,94 @@
+---
+title: "Amoxicillin-125mg Forecasting"
+author: "Rohan Baghel (32725787)"
+date: "2023-10-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(fpp3)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(forecast)
+library(fable)
+library(yardstick)
+```
+
+```{r}
+data <- read_csv(here::here("data/famillyplanning_maternal_child_health_products.csv"))
+
+data$Date <- as.Date(paste0(data$month, "01"), format = "%Y %b %d")
+
+tsibble_data <- data %>%
+  as_tsibble(index = Date, key = c(region, item)) %>%
+  mutate(Date = yearmonth(Date)) %>%
+  select(region, item, Date, total_issued)
+
+```
+
+```{r Amoxicillin_125}
+data_Amoxicillin_125 <- tsibble_data %>% 
+  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"
+         ) 
+
+data_Amoxicillin_125 %>% 
+  autoplot() +
+  facet_wrap(~ region, scales = "free") +
+  theme(legend.position = "none")
+```
+
+```{r message=FALSE,echo=FALSE,warning=FALSE}
+unique_regions_amox125 <- unique(data_Amoxicillin_125)
+
+for (region in unique_regions) {
+  cat("Processing region:", region, "\n")
+  
+  # Filter data for the current region
+  data_region_amox125 <- data_Amoxicillin_125 %>% filter(region == region)
+  
+  # Model creation
+  models_region_amox125 <- data_region_amox125 %>% 
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    )
+  
+  # Forecasting
+  forecast_region_amox125 <- models_region_amox125 %>% 
+    forecast(h = "1 years")
+  
+  # Plotting forecast
+  forecast_region_amox125 %>% 
+    autoplot(data_region_amox125)
+  
+  # Ensure non-negative forecasts
+  forecast_pos_region_amox125 <- forecast_region_amox125 %>%
+    mutate(.mean = ifelse(.mean < 0, 0, .mean))
+  
+  # Cross-validation results
+  cross_val_results_region_amox125 <- data_Amoxicillin_125 %>%
+    filter(region == region) %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    tidy(crossval = TRUE)
+}
+
+
+```
+
+### Forecasting in Addis Ababa
+
+```{r}
+forecast_region_amox125 %>% 
+  filter(region == "Addis Ababa") %>% 
+  autoplot(data_region_amox125 %>% 
+             filter(region == "Addis Ababa"))
+```
+
