@@ -67,7 +67,6 @@ data_Oxytocin%>%
     mutate(.mean = ifelse(.mean < 0, 0, .mean))
 
 
-
   # Cross-validation results
   
   # Stretch tsibble for cross-validation
@@ -96,14 +95,28 @@ winkler_scores <- forecast_pos_region_oxy %>%
                        list(winkler = winkler_score), level = 80)
 ```
 
+```{r}
+#Truncated distribution
+
+forecast_pos_region_oxy %>% 
+  filter(.model == "ARIMA" ) %>%
+  filter(region == "Addis Ababa") %>% 
+   dplyr::mutate(value = distributional::dist_truncated(.mean, 0)) %>% 
+  autoplot(data_Oxytocin %>% 
+             filter(region == "Addis Ababa"))
+  
+```
+
 
 ### Forecasting in Addis Ababa
 
 ```{r}
 forecast_pos_region_oxy %>% 
   filter(region == "Addis Ababa") %>% 
-  autoplot(data_region_oxy %>% 
+  autoplot(data_Oxytocin %>% 
              filter(region == "Addis Ababa"))
+
+
 ```
 
 
@@ -111,13 +124,13 @@ forecast_pos_region_oxy %>%
 ```{r}
 forecast_pos_region_oxy %>% 
   filter(region == "Affar") %>% 
-  autoplot(data_region_oxy %>% 
+  autoplot(data_Oxytocin %>% 
              filter(region == "Affar"))
 ```
 
 ### Forecasting in Amhara
 ```{r}
-forecast_region_oxy %>% 
+forecast_pos_region_oxy %>% 
   filter(region == "Amhara") %>% 
   autoplot(data_region_oxy %>% 
              filter(region == "Amhara"))
@@ -129,7 +142,7 @@ forecast_region_oxy %>%
 glance(models_region_oxy %>% 
          filter(region == "Benishangul-Gumuz"))
 
-forecast_region_oxy %>% 
+forecast_pos_region_oxy %>% 
   filter(region == "Benishangul-Gumuz") %>% 
   autoplot(data_region_oxy %>% 
              filter(region == "Benishangul-Gumuz"))
@@ -137,7 +150,7 @@ forecast_region_oxy %>%
 
 ### Forecasting in Dire Dawa
 ```{r}
-forecast_region_oxy %>% 
+forecast_pos_region_oxy %>% 
   filter(region == "Dire Dawa") %>% 
   autoplot(data_region_oxy %>% 
              filter(region == "Dire Dawa"))
