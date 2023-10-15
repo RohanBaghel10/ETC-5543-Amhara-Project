@@ -1,0 +1,177 @@
+---
+title: "Forecasting of Family Planning Commodities in Ethiopia"
+format:
+  revealjs: 
+    theme: moon
+editor: visual
+---
+
+## Why ?
+
+-   5.3 million children under five predicted to die annually, with half in sub-Saharan Africa.
+
+-   The maternal mortality rates remain extremely high, with two-thirds of global deaths occurring in sub-Saharan Africa.
+
+-   Nigeria contributes around 20% of all maternal fatalities worldwide.
+
+-   Adequate family planning is linked to a reduction in infant mortality
+    rates, as it promotes healthier pregnancies and better child-rearing
+    practices.
+
+## **Ethiopia's Commitment to Family Planning**
+
+-   Family planning recognized as a human right in Ethiopia's Constitution (Article 35(9)).
+
+-   Government abolished contraceptive tax in 2007 and enhanced domestic financial resources for the FP program.
+
+-   Annual allocation to the FP budget has increased over the last decade.
+
+-   Despite progress, the country's FP program heavily relies on external funding.
+
+## Challenges 
+
+-   The Data collection was poor in some districts, affecting the methodologies that could be used.
+
+-   The COVID-19 pandemic created a local trend which meant we needed strictly positive forecasting.
+
+-   The scale of data for each medicine and number of regions.
+
+## Oxytocin
+
+-   Oxytocin's role in family planning is of global health significance, contributing to safe childbirth and reproductive health.
+
+-   Oxytocin is a hormone that plays a crucial role in stimulating uterine contractions during labor and childbirth.
+
+-   Administration of oxytocin is a common practice to prevent postpartum hemorrhage (excessive bleeding) after childbirth.
+
+## Initial Data Analysis
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+
+library(tidyverse)
+library(fpp3)
+
+data <- read_csv(here::here("data/famillyplanning_maternal_child_health_products.csv"))
+
+data$Date <- as.Date(paste0(data$month, "01"), format = "%Y %b %d")
+
+tsibble_data <- data %>%
+  as_tsibble(index = Date, key = c(region, item)) %>%
+  mutate(Date = yearmonth(Date)) %>%
+  select(Date, region, item, total_issued)
+
+data_Oxytocin <- tsibble_data %>% 
+  filter(item == "Oxytocin - 10 Units/ml in 1ml Ampoule - Injection" 
+         )
+
+data_Oxytocin%>% 
+  autoplot() +
+  facet_wrap(~ region, scales = "free") +
+  theme(legend.position = "none") +
+  labs(x = "Year", y = "Total Issued", title = "Initial Data Analysis for Oxytocin") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  
+```
+
+## Forecasting in Addis Ababa using ARIMA
+
+```{r  message=FALSE, warning=FALSE, echo=FALSE}
+
+data_region_oxy <- data_Oxytocin %>% filter(year(Date) < 2022 | (year(Date) == 2022 & month(Date) <= "May"))
+  
+  # Model creation
+  models_region_oxy <- data_region_oxy %>% 
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    )
+  # Forecasting
+  forecast_region_oxy <- models_region_oxy %>% 
+    forecast(h = "1 years")
+  
+  # Ensure non-negative forecasts
+  forecast_pos_region_oxy <- forecast_region_oxy %>%
+    mutate(.mean = ifelse(.mean < 0, 0, .mean))
+```
+
+```{r }
+
+# Forecasting Using ARIMA model
+
+forecast_pos_region_oxy %>% 
+  filter(.model == "ARIMA" ) %>%
+  filter(region == "Addis Ababa") %>% 
+   dplyr::mutate(value = distributional::dist_truncated(.mean, 0)) %>% 
+  autoplot(data_Oxytocin %>% 
+             filter(region == "Addis Ababa")) +
+  labs(x = "Year", y = "Total Issued", title = "Forecasting using ARIMA model")
+```
+
+## Forecasting in Addis Ababa using ETS
+
+```{r}
+# Forecasting Using ARIMA model
+
+forecast_pos_region_oxy %>% 
+  filter(.model == "ETS" ) %>%
+  filter(region == "Addis Ababa") %>% 
+   dplyr::mutate(value = distributional::dist_truncated(.mean, 0)) %>% 
+  autoplot(data_Oxytocin %>% 
+             filter(region == "Addis Ababa")) +
+  labs(x = "Year", y = "Total Issued", title = "Forecasting using ETS model")
+
+```
+
+## Forecasting in Addis Ababa using NAIVE
+
+```{r}
+forecast_pos_region_oxy %>% 
+  filter(.model == "naive" ) %>%
+  filter(region == "Addis Ababa") %>% 
+   dplyr::mutate(value = distributional::dist_truncated(.mean, 0)) %>% 
+  autoplot(data_Oxytocin %>% 
+             filter(region == "Addis Ababa")) +
+  labs(x = "Year", y = "Total Issued", title = "Forecasting using NAIVE model")
+```
+
+## Selecting the Appropriate model
+
+```{r}
+ # Cross-validation results
+  
+  # Stretch tsibble for cross-validation
+  stretched_data_region_oxy <- stretch_tsibble(data_Oxytocin, .init = 1, .step = 1)
+
+  cv_results_region_oxy <- stretched_data_region_oxy %>%
+    filter(region == "Addis Ababa") %>% 
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(data_Oxytocin)
+  
+  kableExtra::kable(cv_results_region_oxy %>% 
+                      select(-item,
+                             -MAPE,
+                             -MPE))
+```
+
+## Winkler Scores
+
+```{r}
+winkler_scores <- forecast_pos_region_oxy %>% 
+  filter(region == "Addis Ababa") %>% 
+  fabletools::accuracy(data_Oxytocin,
+                       list(winkler = winkler_score), level = 80)
+
+kableExtra::kable(winkler_scores)
+```
+
+## Final Thoughts
+
+-   Address issues in data collection methodologies in certain districts.
+
+-   ETS model showcased promising performance, but a comprehensive evaluation is crucial.

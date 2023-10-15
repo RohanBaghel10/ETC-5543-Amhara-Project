@@ -13,6 +13,8 @@ library(tidyverse)
 library(lubridate)
 library(ggplot2)
 library(forecast)
+library(fable)
+library(yardstick)
 ```
 
 ```{r}
@@ -25,13 +27,16 @@ tsibble_data <- data %>%
   mutate(Date = yearmonth(Date)) %>%
   select(region, item, Date, total_issued)
 
+
+
 ```
+
 
 
 ```{r Amoxicillin_125}
 data_Amoxicillin_125 <- tsibble_data %>% 
   filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"
-         )
+         ) 
 
 data_Amoxicillin_125 %>% 
   autoplot() +
@@ -201,4 +206,6 @@ data_Oxytocin%>%
   theme(legend.position = "none")
 
 ```
+
+
 
