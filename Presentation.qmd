@@ -14,9 +14,7 @@ editor: visual
 
 -   Nigeria contributes around 20% of all maternal fatalities worldwide.
 
--   Adequate family planning is linked to a reduction in infant mortality
-    rates, as it promotes healthier pregnancies and better child-rearing
-    practices.
+-   Adequate family planning is linked to a reduction in infant mortality rates, as it promotes healthier pregnancies and better child-rearing practices.
 
 ## **Ethiopia's Commitment to Family Planning**
 
@@ -28,7 +26,7 @@ editor: visual
 
 -   Despite progress, the country's FP program heavily relies on external funding.
 
-## Challenges 
+## Challenges
 
 -   The Data collection was poor in some districts, affecting the methodologies that could be used.
 

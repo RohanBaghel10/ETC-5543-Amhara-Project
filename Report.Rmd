@@ -1,0 +1,361 @@
+---
+title: "Forecasting of Family Planning Medicines in Ethiopia"
+author: "Rohan Baghel (32725787)"
+date: "2023-10-25"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(fpp3)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(forecast)
+library(fable)
+library(bookdown)
+```
+
+## Abstract
+
+
+
+## Introduction
+
+Maternal and child health, especially in the context of pregnancy and childbirth, remains a critical global concern. Each day, over 800 women across the world succumb to complications related to pregnancy and childbirth, while an estimated 5.3 million children under the age of five die each year, with half of these tragedies unfolding in sub-Saharan Africa. Shockingly, maternal mortality rates, particularly in lower-income countries, continue to be alarmingly high, with the majority of these tragic losses occurring in developing nations. Sub-Saharan Africa and Southern Asia bear the heaviest burden, with sub-Saharan Africa alone accounting for a staggering two-thirds of maternal fatalities. Nigeria, situated in sub-Saharan Africa, significantly contributes to this grim statistic, bearing the responsibility for approximately 20% of all maternal deaths globally. The lifetime risk of a Nigerian woman dying during pregnancy or childbirth stands at 1 in 18, surpassing both the sub-Saharan African average of 1 in 22 and the global average of 1 in 92. It's worth noting that women in developing nations often have more pregnancies than those in developed countries, despite the associated dangers.
+
+In recognition of the fundamental importance of family planning, the Alma-Ata Declaration of 1978 marked a milestone by identifying it as a crucial element of primary health care (PHC) within the framework of the Health-for-All Policy. The World Health Organization's (WHO) Regional Committee for Africa, in a pivotal move in 1997, adopted "Reproductive Health: A Strategy for the African Region," emphasizing the critical role of family planning in achieving optimal reproductive health and overall well-being. Further recognition came in 2003 when "Women's Health: A Strategy for the African Region" was accepted by the Regional Committee, acknowledging family planning as an intervention that enhances the quality of life for women. Health ministers across the region underscored the adverse effects of early, repeated, and frequent pregnancies on women's nutritional status, rendering them more susceptible to illnesses, physical exhaustion, and premature aging. They stressed the need to address family planning, particularly birth spacing, as an avenue to improve the quality of life for African women.
+
+However, the effectiveness of family planning services and reproductive health programs in sub-Saharan Africa has been profoundly challenged by the relentless HIV/AIDS pandemic. The escalating HIV/AIDS crisis has necessitated increased resources for family planning initiatives, primarily due to the urgent need to respond to this deteriorating situation. Despite the evident need for access to sexual and reproductive health commodities (SRHC) in countries such as Kenya, Tanzania, Uganda, and Zambia, full access remains elusive due to persisting issues, including shortages, unaffordability, regulatory provisions, and supply chain concerns. Prior research in these countries has largely focused on identifying barriers to access, both on the supply and demand sides, but comprehensive study on the availability and cost of these drugs at the health system level is regrettably lacking. In Uganda, for example, while earlier studies have revealed inadequate access to SRH drugs, extensive research on their availability and affordability at the health system level is still insufficient.
+
+Efforts to address family planning challenges have led to the emergence of initiatives like the UNFPA Supplies partnership. This initiative supports nearly 20 million women and girls worldwide each year, with 8.5 million in East and Southern Africa. Collaborating with various stakeholders, including companies, foundations, NGOs, civil society organizations, and governments, UNFPA Supplies strives to provide modern contraception and life-saving maternal health drugs to 50 of the world's poorest countries, with 15 of them located in East and Southern Africa. Recognizing that family planning is a fundamental human right, preserving access to it is essential for safeguarding the health and well-being of mothers and children.
+
+Ethiopia offers an exemplary case in the endeavor to address family planning challenges. Article 35(9) of the Federal Democratic Republic of Ethiopia's Constitution explicitly grants women the right to family planning, emphasizing the importance of preventing harm arising from pregnancy and childbirth and safeguarding their health. In 2007, the Ethiopian government took significant steps to enhance contraceptive access, such as abolishing the contraceptive tax and empowering the Ethiopian Pharmaceutical Supply Agency to procure and distribute contraceptives. Simultaneously, the government increased domestic financial resources allocated to the family planning program. Over the past decade, the annual allocation to the family planning budget has risen, yet the program still heavily relies on external funding. Advocates continue to press for increased government budgetary allocations to family planning and reproductive health programs in Ethiopia, recognizing the pivotal role these initiatives play in improving the well-being of women and children in the country.
+
+## Importance of Forecasting in Health Sector 
+
+Forecasting of medicines is a crucial aspect of the healthcare sector, with far-reaching implications for patient care, supply chain management, and overall healthcare system efficiency. In this rapidly evolving field, accurate forecasting of medicine requirements is essential to ensure that healthcare providers have the right medications in the right quantities at the right time. Here are several key reasons why forecasting medicines is important in the health sector:
+
+Optimal Patient Care: The foremost objective of healthcare is to provide effective and timely treatment to patients. Accurate forecasting ensures that essential medicines are available when needed. A lack of medicines due to poor forecasting can lead to treatment delays, suboptimal care, and even adverse health outcomes.
+
+Preventing Stockouts: Stockouts of critical medications can have severe consequences, including patient distress, compromised health outcomes, and increased healthcare costs. Forecasting helps in preventing these stockouts by maintaining adequate stock levels based on patient demand.
+
+Cost Efficiency: Efficient forecasting can reduce unnecessary stockpiling of medications, which can be costly due to storage and disposal costs. On the other hand, underestimating the demand can lead to expensive rush orders or emergency procurement. Accurate forecasting helps to strike a balance between these two extremes, optimizing costs.
+
+Resource Allocation: Effective forecasting allows healthcare facilities to allocate their resources wisely. It ensures that hospitals and clinics do not tie up excess capital in unsold medications, enabling them to allocate their resources to other critical areas of patient care.
+
+Epidemic Preparedness: In the context of public health emergencies, such as epidemics or pandemics, forecasting becomes even more critical. It helps authorities plan for surge capacity, ensuring that essential medications are available to treat the affected population promptly.
+
+Reduction of Wastage: Medication wastage is a significant concern in healthcare. Medications that expire before they are used represent a financial loss and environmental burden. Proper forecasting helps minimize this wastage by ensuring that medications are consumed before their expiration date.
+
+Quality Assurance: Medicine forecasting extends beyond quantity to include ensuring the quality of medicines. Accurate forecasting helps in maintaining the integrity of medications by preventing exposure to adverse environmental conditions or prolonged storage.
+
+Improved Supply Chain Management: Forecasting is a cornerstone of effective supply chain management in the healthcare sector. It aids in streamlining procurement, distribution, and inventory management processes, thereby reducing inefficiencies and costs.
+
+Drug Shortage Mitigation: By anticipating potential shortages, healthcare providers, pharmaceutical companies, and regulatory bodies can collaborate to find solutions. This could include exploring alternative suppliers, modifying manufacturing processes, or implementing regulatory changes to ensure a consistent supply of critical medications.
+
+Enhanced Data-Driven Decision Making: Forecasting relies on data analytics and historical trends. By incorporating data-driven insights into the process, healthcare organizations can make informed decisions, aligning their strategies with the evolving needs of the patient population.
+
+Patient Safety: Patient safety is paramount in healthcare. Inaccurate forecasting can lead to medication errors, such as administering the wrong medication due to unavailability. Forecasting helps in ensuring patient safety by minimizing such errors.
+
+In conclusion, forecasting of medicines is a linchpin in the healthcare sector. It influences patient care, cost-efficiency, resource allocation, and overall healthcare system performance. It also plays a pivotal role in public health emergency response, reducing wastage, and ensuring medication quality. In an ever-evolving healthcare landscape, accurate forecasting is an indispensable tool for healthcare organizations to meet the growing demands of their patient populations effectively.
+
+```{r}
+data <- read_csv(here::here("data/famillyplanning_maternal_child_health_products.csv"))
+
+data$Date <- as.Date(paste0(data$month, "01"), format = "%Y %b %d")
+
+tsibble_data <- data %>%
+  as_tsibble(index = Date, key = c(region, item)) %>%
+  mutate(Date = yearmonth(Date)) %>%
+  select(Date, region, item, total_issued)
+```
+
+
+```{r}
+data_Amoxicillin_125 <- tsibble_data %>% 
+  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"
+         ) 
+
+data_Amoxicillin_250 <- tsibble_data %>% 
+  filter(item == "Amoxicillin - 250mg - Tablet (Dispersible)"
+         )
+
+data_Chlorhexidine <- tsibble_data %>% 
+  filter(item == "Chlorhexidine digluconate - 7.1% ( which contains 4% Chlorhexidine) - Gel"   
+         )
+
+data_Etonogestral <- tsibble_data %>% 
+  filter(item == "Etonogestrel - 68mg - Capsule(Subdermal Implant)"   
+         )
+
+data_Gentamicin_10mg <- tsibble_data %>% 
+  filter(item == "Gentamicin - 10mg/ml 2ml - Injection"   
+         )
+
+data_Gentamicin_40mg <- tsibble_data %>% 
+  filter(item == "Gentamicin - 40mg/2ml in 2ml Ampoule - Injection"  
+         )
+
+data_IUCD <- tsibble_data %>% 
+  filter(item == "IUCD (Intrauterine Contraceptive Device) -  - Long acting (CU380 A)" 
+         )
+
+data_Levonorgestrel_0.03mg <- tsibble_data %>% 
+  filter(item == "Levonorgestrel (D-Norgestrel) - 0.03mg - Tablet"  
+         )
+
+data_Levonorgestrel_0.75mg <- tsibble_data %>% 
+  filter(item == "Levonorgestrel (D-Norgestrel) - 0.75mg - Tablet"   
+         )
+
+data_Levonorgestrel_75mg <- tsibble_data %>% 
+  filter(item == "Levonorgestrel - 75mg/capsule pack of 2 capsule"   
+         )
+
+data_Levonorgestrel_mix <- tsibble_data %>% 
+  filter(item == "Levonorgestrel(D-Norgestrel) +Ethinylestradiol + Ferrous Fumerate - (0.15mg + 0.03mg +75mg ) - Tablet"  
+         )
+
+data_MgSO4 <- tsibble_data %>% 
+  filter(item == "Magnesium Sulphate - 50% in 10ml Ampoule - Injection" 
+         )
+
+data_Medroxyprogesterone <- tsibble_data %>% 
+  filter(item == "Medroxyprogesterone Acetate 150mg/ml in 1ml vial (2ml)" 
+         )
+
+data_ORS <- tsibble_data %>% 
+  filter(item == "Oral Rehydration Salt - 20.5g/lit - Powder"
+         )
+
+data_Oxytocin <- tsibble_data %>% 
+  filter(item == "Oxytocin - 10 Units/ml in 1ml Ampoule - Injection" 
+         )
+```
+
+
+```{r}
+ # Filter data for the previous year
+  data_forecast <- tsibble_data %>% filter(year(Date) < 2022 | (year(Date) == 2022 & month(Date) <= "May"))
+  
+  # Model creation
+  models_forecast <- data_forecast %>% 
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    )
+  
+  # Forecasting
+  forecast_horizon <- models_forecast %>% 
+    forecast(h = "1 years")
+  
+  # Ensure non-negative forecasts
+  forecast_pos_only <- forecast_horizon %>%
+    mutate(.mean = ifelse(.mean < 0, 0, .mean))
+
+```
+
+
+
+
+```{r}
+# Cross-validation results
+  
+  # Stretch tsibble for cross-validation
+  stretched_tsdata_amox125 <- stretch_tsibble(data_Amoxicillin_125, .init = 1, .step = 1)
+
+  cv_results_Amox125 <- stretched_tsdata_amox125 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_amox250 <- stretch_tsibble(data_Amoxicillin_250, .init = 1, .step = 1)
+
+  cv_results_Amox250 <- stretched_tsdata_amox250 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+
+  
+  stretched_tsdata_chlor <- stretch_tsibble(data_Chlorhexidine, .init = 1, .step = 1)
+
+  cv_results_chlor <- stretched_tsdata_chlor %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_etono <- stretch_tsibble(
+  data_Etonogestral %>% 
+    filter(region != "South West"),
+  .init = 1,
+  .step = 1
+)
+
+  cv_results_etono <- stretched_tsdata_etono %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Gent10 <- stretch_tsibble(data_Gentamicin_10mg, .init = 1, .step = 1)
+
+  cv_results_Gent10 <- stretched_tsdata_Gent10 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Gent40 <- stretch_tsibble(data_Gentamicin_40mg, .init = 1, .step = 1)
+
+  cv_results_Gent40 <- stretched_tsdata_Gent40 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_IUCD <- stretch_tsibble(
+  data_IUCD %>% 
+    filter(region != "South West"),
+  .init = 1,
+  .step = 1
+)
+
+  cv_results_IUCD <- stretched_tsdata_IUCD %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Lev03 <- stretch_tsibble(data_Levonorgestrel_0.03mg, .init = 1, .step = 1)
+
+  cv_results_Lev03 <- stretched_tsdata_Lev03 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Lev075 <- stretch_tsibble(data_Levonorgestrel_0.75mg, .init = 1, .step = 1)
+
+  cv_results_Lev075 <- stretched_tsdata_Lev075 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Lev75 <- stretch_tsibble(data_Levonorgestrel_75mg, .init = 1, .step = 1)
+
+  cv_results_Lev75 <- stretched_tsdata_Lev75 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Levmix <- stretch_tsibble(data_Levonorgestrel_mix, .init = 1, .step = 1)
+
+  cv_results_Levmix <- stretched_tsdata_Levmix %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+   stretched_tsdata_MgSO4 <- stretch_tsibble(data_MgSO4, .init = 1, .step = 1)
+
+  cv_results_MgSO4 <- stretched_tsdata_MgSO4 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Med <- stretch_tsibble(data_Medroxyprogesterone, .init = 1, .step = 1)
+
+  cv_results_Med <- stretched_tsdata_Med %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_ORS <- stretch_tsibble(data_ORS, .init = 1, .step = 1)
+
+  cv_results_ORS <- stretched_tsdata_ORS %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+  stretched_tsdata_Oxy <- stretch_tsibble(data_Oxytocin, .init = 1, .step = 1)
+
+  cv_results_Oxy <- stretched_tsdata_Oxy %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+```
+
+
+
+```{r}
+# Calculating Winkler Scores
+
+winkler_scores <- forecast_pos_only %>% 
+  fabletools::accuracy(tsibble_data,
+                       list(winkler = winkler_score), level = 80)
+```
+
+### Initial Data Analysis 
+```{r}
+
+```
+
