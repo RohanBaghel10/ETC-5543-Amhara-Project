@@ -1,0 +1,472 @@
+---
+title: "Forecasting of Family Planning Medicines in Ethiopia"
+author: "Rohan Baghel (32725787)"
+date: "2023-10-25"
+format: pdf
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning=FALSE, 
+                      message=FALSE, 
+                      echo=FALSE)
+
+library(fpp3)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(forecast)
+library(fable)
+library(bookdown)
+library(tscount)
+```
+
+## Abstract
+
+Maternal and child health, particularly in the context of pregnancy and childbirth, remains a global concern with high maternal mortality rates in lower-income countries, notably in sub-Saharan Africa. Family planning and accurate forecasting of medicines are pivotal in addressing these challenges. This report delves into the importance of forecasting in the health sector, challenges of forecasting in Ethiopia, and an empirical analysis of forecasting Amoxicillin-125mg across various regions using ETS, ARIMA, and NAIVE models. Time series cross-validation and Winkler Scores were used to evaluate the models' accuracy. The results demonstrate that model selection should be region-specific, considering the unique characteristics of each area. The Winkler Scores offer insights into the quality of the forecasting models, helping in decision-making for efficient pharmaceutical supply management.
+
+## Introduction
+
+Maternal and child health, especially in the context of pregnancy and childbirth, remains a critical global concern. Each day, over 800 women across the world succumb to complications related to pregnancy and childbirth, while an estimated 5.3 million children under the age of five die each year, with half of these tragedies unfolding in sub-Saharan Africa. Shockingly, maternal mortality rates, particularly in lower-income countries, continue to be alarmingly high, with the majority of these tragic losses occurring in developing nations. Sub-Saharan Africa and Southern Asia bear the heaviest burden, with sub-Saharan Africa alone accounting for a staggering two-thirds of maternal fatalities. Nigeria, situated in sub-Saharan Africa, significantly contributes to this grim statistic, bearing the responsibility for approximately 20% of all maternal deaths globally. The lifetime risk of a Nigerian woman dying during pregnancy or childbirth stands at 1 in 18, surpassing both the sub-Saharan African average of 1 in 22 and the global average of 1 in 92. It's worth noting that women in developing nations often have more pregnancies than those in developed countries, despite the associated dangers.
+
+In recognition of the fundamental importance of family planning, the Alma-Ata Declaration of 1978 marked a milestone by identifying it as a crucial element of primary health care (PHC) within the framework of the Health-for-All Policy. The World Health Organization's (WHO) Regional Committee for Africa, in a pivotal move in 1997, adopted "Reproductive Health: A Strategy for the African Region," emphasizing the critical role of family planning in achieving optimal reproductive health and overall well-being. Further recognition came in 2003 when "Women's Health: A Strategy for the African Region" was accepted by the Regional Committee, acknowledging family planning as an intervention that enhances the quality of life for women. Health ministers across the region underscored the adverse effects of early, repeated, and frequent pregnancies on women's nutritional status, rendering them more susceptible to illnesses, physical exhaustion, and premature aging. They stressed the need to address family planning, particularly birth spacing, as an avenue to improve the quality of life for African women.
+
+However, the effectiveness of family planning services and reproductive health programs in sub-Saharan Africa has been profoundly challenged by the relentless HIV/AIDS pandemic. The escalating HIV/AIDS crisis has necessitated increased resources for family planning initiatives, primarily due to the urgent need to respond to this deteriorating situation. Despite the evident need for access to sexual and reproductive health commodities (SRHC) in countries such as Kenya, Tanzania, Uganda, and Zambia, full access remains elusive due to persisting issues, including shortages, unaffordability, regulatory provisions, and supply chain concerns. Prior research in these countries has largely focused on identifying barriers to access, both on the supply and demand sides, but comprehensive study on the availability and cost of these drugs at the health system level is regrettably lacking. In Uganda, for example, while earlier studies have revealed inadequate access to SRH drugs, extensive research on their availability and affordability at the health system level is still insufficient.
+
+Efforts to address family planning challenges have led to the emergence of initiatives like the UNFPA Supplies partnership. This initiative supports nearly 20 million women and girls worldwide each year, with 8.5 million in East and Southern Africa. Collaborating with various stakeholders, including companies, foundations, NGOs, civil society organizations, and governments, UNFPA Supplies strives to provide modern contraception and life-saving maternal health drugs to 50 of the world's poorest countries, with 15 of them located in East and Southern Africa. Recognizing that family planning is a fundamental human right, preserving access to it is essential for safeguarding the health and well-being of mothers and children.
+
+Ethiopia offers an exemplary case in the endeavor to address family planning challenges. Article 35(9) of the Federal Democratic Republic of Ethiopia's Constitution explicitly grants women the right to family planning, emphasizing the importance of preventing harm arising from pregnancy and childbirth and safeguarding their health. In 2007, the Ethiopian government took significant steps to enhance contraceptive access, such as abolishing the contraceptive tax and empowering the Ethiopian Pharmaceutical Supply Agency to procure and distribute contraceptives. Simultaneously, the government increased domestic financial resources allocated to the family planning program. Over the past decade, the annual allocation to the family planning budget has risen, yet the program still heavily relies on external funding. Advocates continue to press for increased government budgetary allocations to family planning and reproductive health programs in Ethiopia, recognizing the pivotal role these initiatives play in improving the well-being of women and children in the country.
+
+## Importance of Forecasting in Health Sector
+
+Forecasting of medicines is a crucial aspect of the healthcare sector, with far-reaching implications for patient care, supply chain management, and overall healthcare system efficiency. In this rapidly evolving field, accurate forecasting of medicine requirements is essential to ensure that healthcare providers have the right medications in the right quantities at the right time. Here are several key reasons why forecasting medicines is important in the health sector:
+
+Optimal Patient Care: The foremost objective of healthcare is to provide effective and timely treatment to patients. Accurate forecasting ensures that essential medicines are available when needed. A lack of medicines due to poor forecasting can lead to treatment delays, suboptimal care, and even adverse health outcomes.
+
+Preventing Stockouts: Stockouts of critical medications can have severe consequences, including patient distress, compromised health outcomes, and increased healthcare costs. Forecasting helps in preventing these stockouts by maintaining adequate stock levels based on patient demand.
+
+Cost Efficiency: Efficient forecasting can reduce unnecessary stockpiling of medications, which can be costly due to storage and disposal costs. On the other hand, underestimating the demand can lead to expensive rush orders or emergency procurement. Accurate forecasting helps to strike a balance between these two extremes, optimizing costs.
+
+Resource Allocation: Effective forecasting allows healthcare facilities to allocate their resources wisely. It ensures that hospitals and clinics do not tie up excess capital in unsold medications, enabling them to allocate their resources to other critical areas of patient care.
+
+Epidemic Preparedness: In the context of public health emergencies, such as epidemics or pandemics, forecasting becomes even more critical. It helps authorities plan for surge capacity, ensuring that essential medications are available to treat the affected population promptly.
+
+Reduction of Wastage: Medication wastage is a significant concern in healthcare. Medications that expire before they are used represent a financial loss and environmental burden. Proper forecasting helps minimize this wastage by ensuring that medications are consumed before their expiration date.
+
+Quality Assurance: Medicine forecasting extends beyond quantity to include ensuring the quality of medicines. Accurate forecasting helps in maintaining the integrity of medications by preventing exposure to adverse environmental conditions or prolonged storage.
+
+Improved Supply Chain Management: Forecasting is a cornerstone of effective supply chain management in the healthcare sector. It aids in streamlining procurement, distribution, and inventory management processes, thereby reducing inefficiencies and costs.
+
+Drug Shortage Mitigation: By anticipating potential shortages, healthcare providers, pharmaceutical companies, and regulatory bodies can collaborate to find solutions. This could include exploring alternative suppliers, modifying manufacturing processes, or implementing regulatory changes to ensure a consistent supply of critical medications.
+
+Enhanced Data-Driven Decision Making: Forecasting relies on data analytics and historical trends. By incorporating data-driven insights into the process, healthcare organizations can make informed decisions, aligning their strategies with the evolving needs of the patient population.
+
+Patient Safety: Patient safety is paramount in healthcare. Inaccurate forecasting can lead to medication errors, such as administering the wrong medication due to unavailability. Forecasting helps in ensuring patient safety by minimizing such errors.
+
+In conclusion, forecasting of medicines is a linchpin in the healthcare sector. It influences patient care, cost-efficiency, resource allocation, and overall healthcare system performance. It also plays a pivotal role in public health emergency response, reducing wastage, and ensuring medication quality. In an ever-evolving healthcare landscape, accurate forecasting is an indispensable tool for healthcare organizations to meet the growing demands of their patient populations effectively.
+
+```{r}
+data <- read_csv(here::here("data/famillyplanning_maternal_child_health_products.csv"))
+
+data$Date <- as.Date(paste0(data$month, "01"), format = "%Y %b %d")
+
+tsibble_data <- data %>%
+  as_tsibble(index = Date, key = c(region, item)) %>%
+  mutate(Date = yearmonth(Date)) %>%
+  select(Date, region, item, total_issued)
+```
+
+```{r}
+data_Amoxicillin_125 <- tsibble_data %>% 
+  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"
+         ) 
+```
+
+```{r}
+ # Filter data for the previous year
+  data_forecast <- tsibble_data %>% filter(year(Date) < 2022 | (year(Date) == 2022 & month(Date) <= "May"))
+  
+  # Model creation
+  models_forecast <- data_forecast %>% 
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    )
+  
+  # Forecasting
+  forecast_horizon <- models_forecast %>% 
+    forecast(h = "1 years")
+  
+  # Ensure non-negative forecasts
+  forecast_pos_only <- forecast_horizon %>%
+    mutate(.mean = ifelse(.mean < 0, 0, .mean))
+```
+
+```{r}
+# Cross-validation results
+  
+  # Stretch tsibble for cross-validation
+  stretched_tsdata_amox125 <- stretch_tsibble(data_Amoxicillin_125, .init = 1, .step = 1)
+
+  cv_results_Amox125 <- stretched_tsdata_amox125 %>%
+    model(
+      ARIMA = ARIMA(total_issued),
+      ETS = ETS(total_issued),
+      naive = NAIVE(total_issued)
+    ) %>%
+    forecast(h = "1 years") %>%
+    fabletools::accuracy(tsibble_data)
+  
+```
+
+```{r}
+# Calculating Winkler Scores
+
+winkler_scores <- forecast_pos_only %>% 
+  fabletools::accuracy(tsibble_data,
+                       list(winkler = winkler_score), level = 80)
+```
+
+\newpage
+
+## Challenges of Forecasting in Ethiopia
+
+The Initial data analysis was performed on the whole data that was provided. It was observed that most of the regions lacked any kind of trend or seasonality. The data collection had been poor in many regions of the country including Addis Ababa, the most populous city of Ethoipia. In this regard "South West" and "Sidama" have not been keeping a good record of the medicines they require.
+
+```{r fig.height=10, fig.width=10}
+
+#| label: amox
+#| fig-cap: Initial Data Analysis for Amoxicillin-125mg
+data_Amoxicillin_125 %>% 
+  autoplot() +
+  facet_wrap(~ region, scales = "free") +
+  theme(legend.position = "none") +
+  labs(x = "Year", y = "Total Issued", title = "Initial Data Analysis for Amoxicillin-125mg") +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+### Poor Data Collection practices
+
+The data collection in the healthcare sector of Ethiopia has been very poor. From the @amox we can observe that data collection is poor especially in "South West". There was no clear trend and seasonality in the visualization for most of the regions. During the COVID-19 pandemic, the data collection was very poor as the limited resources of the health care sector were dedicated to serving patients.
+
+These conclusion seems appropriate as Ethiopia has a population of 120 million people and since it is a low income country. The lack of resources would hinder any appropriate data collection practices.
+
+The challenges of poor data collection can have the following impact on the forecasting methodologies. These are some of the problems that we could face when undertaking such a project.
+
+-   Inaccurate Forecasts
+
+    One of the foremost challenges in forecasting with poor data collection is the high likelihood of inaccurate predictions. The quality of forecasts heavily relies on the quality of historical data. When historical data is incomplete, incorrect, or inconsistent, it becomes exceedingly challenging to identify meaningful patterns and trends that are crucial for making accurate predictions.
+
+-   Limited Historical Context
+
+    Inadequate data collection often leads to a limited historical dataset. Historical context is essential for understanding how various factors have influenced past outcomes and how they might affect future outcomes. Without a sufficiently extensive historical dataset, it becomes arduous to make well-informed forecasts.
+
+-   Biased or Skewed Data
+
+    Poor data collection can introduce bias or skewness into the dataset, leading to forecasts that are inaccurate and unreliable. For example, if data is collected only during specific periods or under particular conditions, it may not capture the full range of possible scenarios. The resulting forecasts may be skewed towards those conditions and fail to account for others.
+
+-   Missing Data Points
+
+    Incomplete data often results in missing data points, creating gaps in the dataset. This makes it difficult to analyze and model the relationships between variables. Missing data can lead to inaccuracies in forecasts as the model may not have all the necessary information to make predictions.
+
+-   Noisy Data
+
+    Poor data quality often includes noisy data, which contains irrelevant or random fluctuations. Noise can obscure meaningful patterns and make it challenging to distinguish true signals from background noise. This can lead to forecasts that are less reliable, as the model may misinterpret the significance of noisy data.
+
+-   Lack of Features
+
+    Inadequate data collection may result in a lack of relevant features or variables needed for forecasting. A comprehensive set of features is essential for accurate forecasting, as they allow the model to account for all the factors influencing the target variable. Without these features, forecasts may lack essential context.
+
+-   Limited Sample Size
+
+    A small dataset, often associated with poor data collection, can lead to overfitting. Overfit models may perform well on the available data but may not generalize effectively to new data, leading to poor forecasts. Overfitting is a common challenge when data is scarce, and it can undermine the utility of forecasts.
+
+-   Unrepresentative Data
+
+    If the data collected is not representative of the population or the specific domain being forecasted, the resulting forecasts may be unreliable. Representative data should cover a wide range of scenarios and demographics to be useful for forecasting. Poor data collection practices may lead to biased or unrepresentative data sets.
+
+-   Difficulty in Model Selection
+
+    Limited data can make it challenging to choose an appropriate forecasting model. Some models require a substantial amount of data to perform effectively, and choosing the wrong model can lead to poor predictions. Inadequate data makes model selection a particularly challenging aspect of forecasting.
+
+-   Increased Uncertainty
+
+    Poor data quality and limited historical data can lead to increased uncertainty in forecasts. Decision-makers may be hesitant to rely on forecasts with high levels of uncertainty, which can affect planning and resource allocation. The uncertainty introduced by poor data collection can hinder effective decision-making.
+
+\newpage
+
+### Lack of clear trend and seasonality
+
+When dealing with time series data that lacks clear trends or seasonality, the dynamics of forecasting undergo notable changes. The absence of these typical patterns requires a more nuanced approach to generate meaningful forecasts.
+
+-   Absence of Discernible Patterns
+
+    Time series data without evident trends or seasonality appears to be a jumble of data points without any coherent structure or pattern. This absence of a structural foundation makes forecasting more challenging, as there is no readily identifiable behavior to model.
+
+-   Dependence on Statistical Methods
+
+    The absence of trends or seasonality necessitates a greater reliance on statistical methods. Techniques such as Autoregressive Integrated Moving Average (ARIMA) models and exponential smoothing gain prominence. These methods are better equipped to handle the short-term fluctuations and random variability present in the data.
+
+-   Short-Term Outlook
+
+    In the absence of long-term trends or seasonal cycles, forecasting tends to become more focused on short-term predictions. The primary goal is to understand and anticipate fluctuations and variations in the near future, as these are often more perceptible.
+
+-   Increased Importance of External Factors
+
+    External factors and exogenous variables come to the forefront in such cases. Economic indicators, policy changes, or other external events become more significant in influencing the forecasts. The absence of internal patterns necessitates looking beyond the data for predictive cues.
+
+-   Frequent Model Updates
+
+    The unpredictable nature of the data necessitates more frequent updates to forecasting models. Continuous reevaluation and refinement are essential to adapt to rapidly changing conditions.
+
+-   Elevated Uncertainty
+
+    Without clear trends or seasonality, forecasts inherently become more uncertain. The predictions may come with wider confidence intervals, which calls for a greater reliance on scenario planning and risk assessment.
+
+-   Critical Model Selection
+
+    The choice of forecasting model becomes a pivotal decision. Different statistical or machine learning models may yield varying results. Experimentation with different approaches is often required to identify the most suitable model for a given dataset.
+
+-   Expert Judgment and Domain Knowledge
+
+    Expert judgment and domain knowledge take on a central role in forecasting under these conditions. Experts can provide invaluable insights into the underlying factors driving the data and help identify potential sources of variation.
+
+-   Continuous Model Monitoring
+
+    Ongoing monitoring of the forecasting model's performance is imperative. The absence of clear patterns means that adaptability and continuous adjustment are necessary as the data evolves.
+
+-   Data Volatility
+
+    In the absence of clear trends or seasonality, data can exhibit higher volatility. This necessitates the use of a robust forecasting model that can effectively handle sudden and pronounced fluctuations.
+
+-   Emphasis on Risk Assessment
+
+    Given the increased uncertainty, risk assessment becomes a fundamental consideration. Forecasters must evaluate the potential impact of various scenarios and be prepared to address unexpected outcomes.
+
+-   Readiness to Respond
+
+    The absence of clear trends implies that forecasting often involves preparing for rapid responses. Organizations and individuals may need to be agile and adaptable to changing market conditions or emerging factors.
+
+-   Data Preprocessing Significance
+
+    Appropriate data preprocessing becomes critical. Outliers and noise may have a more substantial impact on forecasts, making data cleaning and outlier handling crucial steps.
+
+-   Data Visualization
+
+    Effective data visualization techniques are essential to extract insights from what may seem like a chaotic dataset. Visualizations can help identify any subtle patterns or outliers that might be hidden in the data.
+
+-   Focus on Leading Indicators
+
+    In the absence of traditional trends, the significance of leading indicators, which provide early signals of potential future changes, is amplified. These indicators guide forecasting efforts in a more uncertain environment.
+
+-   Holistic Approach
+
+    A holistic approach, combining statistical models, machine learning algorithms, expert insights, and external data sources, may be necessary to build a robust forecasting framework that can thrive in the absence of typical patterns.
+
+-   Embrace Experimentation and Learning
+
+    Forecasters may need to be more open to experimentation and learning. Flexibility in trying different methods and being receptive to model adjustments is crucial to navigate this challenging forecasting landscape.
+
+-   Resource Allocation
+
+    Organizations should allocate resources for ongoing data collection and analysis to support the forecasting process. This is essential, as more frequent updates and model adjustments may be required to maintain accuracy in an environment where patterns are elusive.
+
+\newpage
+
+## Forecasting Amoxicillin-125mg using different forecasting methods
+
+The forecasting for Amoxicillin-125mg was performed using three different methods. The models chosen were ARIMA, ETS and NAIVE as they were simple to implement on the data set and could produce a forecast for the medicine. A Forecast horizon for one year was chosen as the data collected was erratic in nature and short term forecast would be ideal.
+
+The Forecast had to be strictly positive as negative forecasts suggest that the demand for a product or service is expected to drop below zero, which is not practically possible. In the case of pharmaceuticals, it's impossible for the demand for a specific medication to be negative. Negative forecasts may lead to confusion and misinterpretation of the data.
+
+Negative forecasts can create confusion for decision-makers. If a forecast indicates a negative demand, it may lead to incorrect decisions, such as reducing production when an actual increase in demand is anticipated.
+
+### ETS Model
+
+Exponential Smoothing State Space (ETS) modeling is a time series forecasting method used to predict future data points based on historical observations. ETS models are particularly effective when dealing with data that exhibits trends and seasonality.
+
+ETS models decompose a time series into three main components: error (E), trend (T), and seasonality (S). The "error" component represents random fluctuations in the data. The "trend" component captures the underlying direction in the data, whether it's increasing, decreasing, or staying relatively constant. The "seasonality" component accounts for repeating patterns or cycles in the data, such as daily, weekly, or yearly seasonality.
+
+The key idea behind ETS models is to update and forecast these three components using a combination of weighted averages, with the weights adjusted over time. The model has various forms, such as ETS(AAA), ETS(ANN), or ETS(MAM), where each letter signifies the presence or absence of error, trend, and seasonality components, respectively.
+
+ETS models are highly flexible and can adapt to different data patterns by adjusting the smoothing parameters and equations governing the three components.
+
+From the plot, we can see that prediction intervals for the forecasting are very wide due to the chaotic and erratic nature of the data collection. The ETS model has not been able to capture any trend or seasonality components. It fails to forecast any positive values for "South West" and "Sidama".
+
+Visually the ETS model does not seem to give any promising results.
+
+```{r fig.height=10, fig.width=10}
+
+#| label: forecast-plot-ETS
+#| fig-cap: Forecasting for Amoxicillin-125mg using ETS
+
+forecast_pos_only %>% 
+  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)") %>%
+  filter(.model == c("ETS")) %>% 
+  autoplot(tsibble_data %>% 
+             filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)")) +
+  facet_wrap(~ region, scales = "free") +
+  labs(x = "Year", y = "Total Issued", title = "Forecasting for Amoxicillin-125mg using ETS") +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+\newpage
+
+### ARIMA Model
+
+ARIMA, or Autoregressive Integrated Moving Average, is a popular time series forecasting model used to predict future data points based on past observations. It's a versatile and widely applied method for handling time series data with various trends and patterns.
+
+ARIMA consists of three main components:
+
+Autoregressive (AR) component: This component models the relationship between the current data point and its past values. It captures the idea that future values depend on previous values with a set of coefficients that describe the lag effect.
+
+Integrated (I) component: The "I" signifies differencing the time series data to make it stationary, which means removing trends and making the data's statistical properties constant over time. This differencing step is crucial to stabilize the data and make it suitable for ARIMA modeling.
+
+Moving Average (MA) component: The MA component models the relationship between the current data point and past forecast errors. It helps account for short-term irregularities and noise in the data.
+
+ARIMA models are specified using three parameters: p (autoregressive order), d (order of differencing), and q (moving average order). By adjusting these parameters, you can create different ARIMA models to fit various time series patterns, whether they exhibit trends, seasonality, or other characteristics.
+
+The ARIMA model visually shows some promise and can forecast well for some regions.
+
+```{r fig.height=10, fig.width=10}
+
+#| label: forecast-plot-ARIMA
+#| #| fig-cap: Forecasting for Amoxicillin-125mg using ARIMA
+
+forecast_pos_only %>% 
+  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)") %>%
+  filter(.model == c("ARIMA")) %>% 
+  autoplot(tsibble_data %>% 
+             filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)")) +
+  facet_wrap(~ region, scales = "free") +
+  labs(x = "Year", y = "Total Issued", title = "Forecasting for Amoxicillin-125mg using ARIMA") +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+\newpage
+
+### NAIVE model
+
+The Naive model, also known as the Naive Forecast or Naive Method, is one of the simplest and most straightforward time series forecasting techniques. It assumes that future values in a time series will be the same as the most recent historical value, essentially projecting a constant value forward. The Naive model is based on the idea that there is no trend, seasonality, or any other underlying pattern in the data; the future is entirely determined by the most recent observation.
+
+Mathematically, the Naive model can be expressed as:
+
+**Forecast for time t+1=Value at time t.**
+
+This approach is useful when dealing with very stable or highly random data, where no discernible pattern or trend exists. However, it is extremely simplistic and lacks the ability to capture any changes or variations in the time series. In cases with more complex data, the Naive model is not suitable because it tends to provide forecasts that are often highly inaccurate.
+
+While the Naive model may be limited in its forecasting capabilities, it serves as a useful baseline for evaluating the performance of more sophisticated forecasting methods. Comparing the results of more advanced models to the Naive model can help determine whether the additional complexity and effort in forecasting yield meaningful improvements.
+
+The NAIVE method doesn't show any promising results and should not be used as it has large prediction intervals compared to ETS and ARIMA. It does not capture any seasonality or trend that ETS and ARIMA may capture even if they are on a small scale.
+
+```{r fig.height=10, fig.width=10}
+
+#| label: forecast-plot-NAIVE
+#| fig-cap: Forecasting for Amoxicillin-125mg using NAIVE
+
+forecast_pos_only %>% 
+  filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)") %>%
+  filter(.model == c("naive")) %>% 
+  autoplot(tsibble_data %>% 
+             filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)")) +
+  facet_wrap(~ region, scales = "free") +
+  labs(x = "Year", y = "Total Issued", title = "Forecasting for Amoxicillin-125mg using NAIVE method") +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+\newpage
+
+### Time Series Cross Validation
+
+Time series cross-validation is a critical technique for evaluating the performance of forecasting models on time-dependent data. Unlike traditional cross-validation, where data points are randomly shuffled, time series data has a sequential nature, and temporal dependencies must be considered. Time series cross-validation addresses this by simulating the real-world scenario where models are trained on historical data and tested on future data.
+
+The key steps involved in time series cross-validation are:
+
+1\. **Splitting Data**: The time series is divided into a training set and a testing set. The training set contains historical data, and the testing set contains future data. The split can be conducted with various strategies, like expanding window, rolling window, or walk-forward validation.
+
+2\. **Model Training and Testing**: Models are trained on the training set and then used to make forecasts for the testing set. The training period is progressively moved forward in each iteration to simulate real-world forecasting.
+
+3\. **Evaluation Metrics**: Performance metrics like Mean Absolute Error (MAE), Root Mean Square Error (RMSE), or Mean Absolute Percentage Error (MAPE) are computed for each iteration to assess the model's accuracy.
+
+4\. **Aggregating Results**: The performance metrics from all iterations are typically averaged to obtain an overall evaluation of the model's predictive ability.
+
+Time series cross-validation accounts for the temporal structure in the data and provides a more realistic estimate of a model's forecasting performance. It helps in identifying potential issues with overfitting or underfitting and guides the selection of the best forecasting model for making accurate predictions on future data.
+
+### Selecting the Model using RMSE
+
+Root Mean Square Error (RMSE) is a common metric used for model selection in forecasting. It quantifies the accuracy of a forecasting model by measuring the average magnitude of the errors between the predicted values and the actual observed values in a time series. A lower RMSE indicates a better model fit and superior forecasting performance.
+
+The RMSE is calculated as follows:
+
+1\. Compute the error for each individual forecast: Subtract the predicted value from the actual observed value at each time step.
+
+2\. Square these errors to eliminate negative values and give more weight to larger errors.
+
+3\. Calculate the mean (average) of these squared errors.
+
+4\. Take the square root of the mean squared errors to obtain the RMSE.
+
+The RMSE measures the degree to which a forecasting model's predictions deviate from the actual values. Smaller RMSE values suggest that the model's forecasts are closer to the observed data, indicating a better model fit. It is particularly useful when comparing multiple models to determine which one provides the most accurate forecasts.
+
+However, RMSE has some limitations. It penalizes larger errors more heavily, which may not always be appropriate, especially if the cost of different types of errors varies. Additionally, RMSE may not provide a complete understanding of forecast quality on its own, so it's often used in conjunction with other evaluation metrics, such as Mean Absolute Error (MAE) and Mean Absolute Percentage Error (MAPE), for a more comprehensive assessment of forecasting models.
+
+In evaluating the performance of different forecasting models for the prescription of Amoxicillin-125mg across various regions, the Root Mean Square Error (RMSE) was employed as a key metric to determine the accuracy and quality of the models' predictions. Lower RMSE values indicate better model performance. After analyzing the results, the choice of the best model varied by region. For Addis Ababa, ETS emerged as the optimal model with an RMSE of 119.46, while in Affar, the ARIMA model demonstrated the best fit with an RMSE of 107.34. The same ARIMA model also stood out as the preferred choice for Amhara, despite a considerably higher RMSE of 1867.15. In Benishangul-Gumuz, ARIMA outperformed other models with an RMSE of 1081.33. For Dire Dawa, the ETS model excelled with an RMSE of 13.11. Although several regions had NaN (Not-a-Number) values, indicating missing or invalid RMSE results, based on available data, ARIMA models were predominant. The models for Gambella, Harari, Oromia, Somali, Sidama, South West, and Tigray regions were all best represented by ARIMA models.
+
+```{r fig.align='center'}
+kableExtra::kable(cv_results_Amox125 %>% 
+                    select(-MPE,
+                           -MAPE,
+                           -item,
+                           -.type,
+                           -ACF1),
+                  caption = "Cross-validation results for Amoxicillin-125mg") %>%
+  kableExtra::kable_styling(position = "center")
+
+```
+
+\newpage
+
+### Winkler Scores
+
+The Winkler Score is a way to quantify the accuracy of a forecast by comparing it to the actual outcomes. It takes into account both the degree of correctness and the distance between the forecast and the actual value. The score is typically a number between 0 and 1, where 1 represents a perfect forecast, and 0 indicates no accuracy at all.
+
+The formula for calculating the Winkler Score is as follows:
+
+Winkler Score = 1 - (\|F - O\| / R)
+
+Where:
+
+\- F represents the forecasted value.
+
+\- O represents the observed (actual) value.
+
+\- R is a predefined "tolerance" value or a critical value that defines an acceptable level of error. It is essentially a measure of how much deviation from the actual value can still be considered an accurate forecast.
+
+The Winkler Score penalizes forecasts that are further from the actual outcome by decreasing the score as the forecast error (\|F - O\|) increases. If the forecast is very close to the actual value (small error), the score will be close to 1, indicating a high level of accuracy. On the other hand, if the forecast is far from the actual value (large error), the score will approach 0, indicating poor accuracy.
+
+The choice of the tolerance value (R) is essential, as it determines what level of error is acceptable for a particular application. Different domains and forecasting tasks may have different criteria for what constitutes an accurate forecast, so the tolerance value can be adjusted accordingly.
+
+In summary, the Winkler Score is a method for quantifying the accuracy of forecasts by considering both the magnitude of the error and a predefined tolerance level. It is a useful tool for evaluating and comparing the performance of forecasting models and methods in various fields.
+
+The Winkler Scores for the forecasting models of Amoxicillin-125mg Tablet (Dispersible) across different regions were examined, aiming to assess the accuracy and effectiveness of these models in predicting prescription needs. The Winkler Scores are essential in quantifying the quality of the models, with higher scores indicating better predictions. Notably, the choice of the best model varied significantly among regions. For Addis Ababa, the ETS model scored the highest, boasting a Winkler Score of 1693.45, indicating a strong predictive performance. In contrast, for Affar, the ARIMA model excelled with a score of 389.19. Notably, some regions presented challenges, with missing or undefined scores (NaN) or infinite values (Inf), signifying difficulties in model accuracy. Regions such as Harari, Sidama, South West, and Tigray encountered these issues. Nevertheless, by assessing the Winkler Scores, it is possible to make informed decisions regarding the choice of forecasting models for Amoxicillin-125mg Tablet (Dispersible) prescription needs, tailoring the selection to each region's specific requirements and historical trends. Careful consideration of these scores is essential for ensuring efficient and accurate pharmaceutical supply management.
+
+```{r fig.align='center'}
+kableExtra::kable(winkler_scores %>% 
+       filter(item == "Amoxicillin - 125mg - Tablet (Dispersible)"),
+      caption = "Winkler Scores for Amoxicillin - 125mg - Tablet (Dispersible)") %>% 
+  kableExtra::kable_styling(position = "center")
+
+```
+
+\newpage
+
+## Conclusion
+
+The report delves into the challenges of forecasting in Ethiopia, noting the issues related to poor data collection practices, unrepresentative data, and difficulties in modeling trends and seasonality. These challenges are crucial to address for effective healthcare resource allocation and pharmaceutical supply management.
+
+In the empirical analysis of forecasting Amoxicillin-125mg across various regions, three different models were employed: ETS, ARIMA, and NAIVE. The results revealed the need for region-specific model selection, taking into account the unique characteristics and historical data of each area. While ETS, ARIMA, and NAIVE models showed promise in certain regions, the choice of the best model varied by location.
+
+The application of time series cross-validation and the evaluation of Winkler Scores proved to be instrumental in assessing the accuracy and quality of the forecasting models. These scores provided valuable insights into the models' predictive performance, assisting in informed decision-making for efficient pharmaceutical supply management.
+
+In conclusion, accurate forecasting in the healthcare sector is essential to ensure optimal patient care, prevent stockouts, allocate resources efficiently, and prepare for public health emergencies. While challenges exist, the use of appropriate modeling techniques and evaluation methods can guide the selection of the most suitable forecasting models for specific regions, ultimately improving maternal and child health outcomes and healthcare resource management.
