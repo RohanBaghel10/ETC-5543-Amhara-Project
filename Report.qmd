@@ -1,8 +1,8 @@
 ---
 title: "Forecasting of Family Planning Medicines in Ethiopia"
-author: "Rohan Baghel (32725787)"
+author: "Dr. Bahman Rostami-Tabar, Rohan Baghel (32725787)"
 date: "2023-10-25"
-format: pdf
+format: pdf    
 ---
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
@@ -14,11 +14,10 @@ knitr::opts_chunk$set(echo = TRUE,
 library(fpp3)
 library(tidyverse)
 library(lubridate)
-library(ggplot2)
 library(forecast)
 library(fable)
 library(bookdown)
-library(tscount)
+
 ```
 
 ## Abstract
