@@ -4,6 +4,8 @@ This Git repository is dedicated to the research and analysis of healthcare fore
 
 Repository Contents
 
+Code: Contains the code to generate the analysis and forecast
+
 Intro: Files contains the why we are doing this report and other aspects of importnace in this research.
 
 Report: This fie contains comprehensive reports that cover the importance of healthcare forecasting, challenges faced in the Ethiopian healthcare system, and empirical analysis of medicine forecasting models with its main focus on Amoxicillin 125mg.
