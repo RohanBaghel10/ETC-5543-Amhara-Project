@@ -1,7 +1,7 @@
 ---
 title: "Forecasting of Family Planning Medicines in Ethiopia"
 author: "Dr. Bahman Rostami-Tabar, Rohan Baghel (32725787)"
-date: "2023-10-25"
+date: "2023-25-10"
 format: pdf    
 ---
 
@@ -469,3 +469,13 @@ In the empirical analysis of forecasting Amoxicillin-125mg across various region
 The application of time series cross-validation and the evaluation of Winkler Scores proved to be instrumental in assessing the accuracy and quality of the forecasting models. These scores provided valuable insights into the models' predictive performance, assisting in informed decision-making for efficient pharmaceutical supply management.
 
 In conclusion, accurate forecasting in the healthcare sector is essential to ensure optimal patient care, prevent stockouts, allocate resources efficiently, and prepare for public health emergencies. While challenges exist, the use of appropriate modeling techniques and evaluation methods can guide the selection of the most suitable forecasting models for specific regions, ultimately improving maternal and child health outcomes and healthcare resource management.
+
+##### Github Repository
+
+https://github.com/RohanBaghel10/ETC-5543-Amhara-Project.git
+
+#### References
+
+1.  *Forecasting: Principles and Practice (3rd ed)*. (n.d.). https://otexts.com/fpp3/
+2.  Yitayew, S., Asemahagn, M. A., & Zeleke, A. A. (2019). Primary healthcare data management practice and associated factors: The case of health extension workers in Northwest Ethiopia. *The Open Medical Informatics Journal*, *13*(1), 2--7. https://doi.org/10.2174/1874431101913010002
+3.  Soyiri, I., & Reidpath, D. D. (2012). An overview of health forecasting. *Environmental Health and Preventive Medicine*, *18*(1), 1--9. https://doi.org/10.1007/s12199-012-0294-6

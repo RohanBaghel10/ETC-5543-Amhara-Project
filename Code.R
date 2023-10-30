@@ -1,6 +1,27 @@
 This File contains all the code that was used in Forecasting the various Family planning medicines that are being used in Ethiopia.
 The main focus is on "Amoxicillin - 125mg - Tablet (Dispersible)".
 
+software:
+  - name: R
+version: 4.3.0
+packages:
+  - name: bookdown
+version: 0.35
+- name: tidyverse
+version: 2.0.0
+- name: lubridate
+version: 1.9.2
+- name: forecast
+version: 8.21  
+- name: fable
+version: 0.3.3
+- name: fpp3
+version: 0.5
+- name: fabletools
+version:  0.3.3
+- name: kableExtra
+version: 1.3.4
+
 
 # Read the CSV file and create a data frame
 data <- read_csv(here::here("data/famillyplanning_maternal_child_health_products.csv"))
